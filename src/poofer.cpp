@@ -39,22 +39,22 @@ poofer::poofer() {
   // Pattern 1
   patternStep* pattern1steps = (patternStep *) malloc(PATTERN_1_COUNT * sizeof(patternStep));
   pattern1steps[0] = {0, {HIGH, LOW, LOW, LOW, LOW, LOW}};
-  pattern1steps[1] = {100, {LOW, LOW, LOW, LOW, LOW, LOW}};
-  pattern1steps[2] = {500, {LOW, HIGH, LOW, LOW, LOW, LOW}};
-  pattern1steps[3] = {600, {LOW, LOW, LOW, LOW, LOW, LOW}};
-  pattern1steps[4] = {1000, {HIGH, LOW, LOW, LOW, LOW, LOW}};
-  pattern1steps[5] = {1100, {LOW, LOW, LOW, LOW, LOW, LOW}};
-  pattern1steps[6] = {1300, {LOW, HIGH, LOW, LOW, LOW, LOW}};
-  pattern1steps[7] = {1400, {LOW, LOW, LOW, LOW, LOW, LOW}};  
-  pattern1steps[8] = {2000, {HIGH, HIGH, LOW, LOW, LOW, LOW}};
-  pattern1steps[9] = {2500, {LOW, LOW, LOW, LOW, LOW, LOW}};
-  pattern1steps[10] = {3000, {HIGH, HIGH, LOW, LOW, LOW, LOW}};
+  pattern1steps[1] = {100, {LOW, LOW, LOW, HIGH, LOW, LOW}};
+  pattern1steps[2] = {500, {LOW, HIGH, HIGH, LOW, LOW, HIGH}};
+  pattern1steps[3] = {600, {LOW, LOW, LOW, LOW, HIGH, LOW}};
+  pattern1steps[4] = {1000, {HIGH, LOW, LOW, HIGH, LOW, LOW}};
+  pattern1steps[5] = {1100, {LOW, LOW, HIGH, LOW, LOW, HIGH}};
+  pattern1steps[6] = {1300, {LOW, HIGH, LOW, HIGH, LOW, LOW}};
+  pattern1steps[7] = {1400, {LOW, LOW, HIGH, LOW, LOW, HIGH}};  
+  pattern1steps[8] = {2000, {HIGH, HIGH, LOW, HIGH, LOW, LOW}};
+  pattern1steps[9] = {2500, {LOW, LOW, LOW, HIGH, LOW, LOW}};
+  pattern1steps[10] = {3000, {HIGH, HIGH, HIGH, LOW, LOW, HIGH}};
   pattern1steps[11] = {3500, {LOW, LOW, LOW, LOW, LOW, LOW}};
   pattern1steps[12] = {4500, {HIGH, HIGH, LOW, LOW, LOW, LOW}};
-  pattern1steps[13] = {5000, {HIGH, HIGH, LOW, LOW, LOW, LOW}};
-  pattern1steps[14] = {5500, {HIGH, HIGH, LOW, LOW, LOW, LOW}};
-  pattern1steps[15] = {6000, {HIGH, HIGH, LOW, LOW, LOW, LOW}};
-  pattern1steps[16] = {6500, {HIGH, HIGH, LOW, LOW, LOW, LOW}};
+  pattern1steps[13] = {5000, {HIGH, HIGH, HIGH, LOW, LOW, HIGH}};
+  pattern1steps[14] = {5500, {HIGH, HIGH, HIGH, LOW, LOW, LOW}};
+  pattern1steps[15] = {6000, {HIGH, HIGH, LOW, HIGH, LOW, LOW}};
+  pattern1steps[16] = {6500, {HIGH, HIGH, LOW, LOW, LOW, HIGH}};
   pattern1steps[17] = {8000, {HIGH, HIGH, LOW, LOW, LOW, LOW}};
   patterns[0] = {PATTERN_1_COUNT, pattern1steps};
 
@@ -185,6 +185,16 @@ void poofer::iteratePattern() {
       }
     }
   }
+}
+
+//! Is a certain valve on?
+bool poofer::valveOpen(int valve) {
+  if (runningPattern == PATTERNS_OFF || stepNumber >= patterns[runningPattern].numberOfSteps) {
+    return false;
+  } else if (valve < POOFER_COUNT) {
+    return patterns[runningPattern].steps[stepNumber].pooferState[valve];
+  }
+  return false;
 }
 
 //! Pattern runnning?

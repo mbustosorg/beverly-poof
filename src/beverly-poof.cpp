@@ -23,6 +23,10 @@
 #include "Adafruit_Trellis.h"
 
 void processAuxCommands();
+void processRcCommands();
+void processKeyboard();
+void clearDisplay();
+void displayPooferStatus();
 
 poofer poof = poofer();
 Adafruit_Trellis matrix0 = Adafruit_Trellis();
@@ -70,22 +74,51 @@ void setup() {
 
 void loop() {
   if (!poof.patternRunning()) {
-    processAuxCommands();
+    processRcCommands();
   }    
   poof.iteratePattern();
+  if (pooferCommandStart <= 0) {
+    clearDisplay();
+    processKeyboard();
+    displayPooferStatus();
+  }
+  trellis.writeDisplay();
+}
 
-  delay(30);
-  if (trellis.readSwitches()) {
-    for (uint8_t i = 0; i < numKeys; i++) {
-      if (trellis.justPressed(i)) {
-        Serial.print("v"); Serial.println(i);
-        trellis.setLED(i);
-      } 
-      if (trellis.justReleased(i)) {
-        Serial.print("^"); Serial.println(i);
-        trellis.clrLED(i);
+//! Clear display
+void clearDisplay() {
+  for (uint8_t i=0; i<numKeys; i++) {
+    trellis.clrLED(i);
+  }
+}
+
+//! Show which valves are open
+void displayPooferStatus() {
+  if (poof.patternRunning()) {
+    delay(30);
+    for (int i = 0; i < POOFER_COUNT; i++) {
+      if (poof.valveOpen(i)) {
+        trellis.setLED(poof.leds[i]);
       }
-      trellis.writeDisplay();
+    }
+  }
+}
+
+//! Process keyboard presses
+void processKeyboard() {
+  if (!poof.patternRunning()) {
+    delay(30);
+    if (trellis.readSwitches()) {
+      for (uint8_t i = 0; i < numKeys; i++) {
+        if (trellis.justPressed(i)) {
+          Serial.print("v"); Serial.println(i);
+          trellis.setLED(i);
+        } 
+        if (trellis.justReleased(i)) {
+          Serial.print("^"); Serial.println(i);
+          trellis.clrLED(i);
+        }
+      }
     }
   }
 }
@@ -111,7 +144,7 @@ void processCommand(int pin, int pattern) {
 }
 
 //! Process incoming aux commands
-void processAuxCommands() {
+void processRcCommands() {
   if (digitalRead(aux1pin) == HIGH && pooferCommandStart == 0) {
     if (pooferCommandDetect > 0) {
       if (millis() - pooferCommandDetect > POOFER_DEBOUNCE) {
@@ -144,10 +177,4 @@ void processAuxCommands() {
       processCommand(aux4pin, 3);
     }
   }
-  if (pooferCommandStart == 0 && pooferStartControl == 0 and !poof.patternRunning()) {
-    for (uint8_t i=0; i<numKeys; i++) {
-      trellis.clrLED(i);
-    }
-  }
-  trellis.writeDisplay();
 }

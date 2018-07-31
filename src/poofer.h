@@ -20,7 +20,7 @@
 #ifndef poofer_h
 #define poofer_h
 
-#define POOFER_COUNT (6)
+const int POOFER_COUNT = 6;
 
 #define PATTERN_COUNT (4)
 #define PATTERN_1_COUNT (18)
@@ -50,9 +50,10 @@ class poofer {
   void startPattern(int id);
   void iteratePattern();
   bool patternRunning();
-
+  bool valveOpen(int valve);
   void poof(int id, int state);
 
+  int leds[POOFER_COUNT] = {0, 3, 5, 10, 12, 15};
   int pooferPins[POOFER_COUNT] = {0, 2, 4, 6, 8, 10};
   int ignitorPins[POOFER_COUNT] = {1, 3, 5, 7, 9, 11};
   bool ignitorState[POOFER_COUNT] = {false, false, false, false, false, false};
