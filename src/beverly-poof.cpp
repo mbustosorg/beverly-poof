@@ -79,7 +79,7 @@ void loop() {
   poof.iteratePattern();
   if (pooferCommandStart <= 0) {
     clearDisplay();
-    processKeyboard();
+    //processKeyboard();
     displayPooferStatus();
   }
   trellis.writeDisplay();
