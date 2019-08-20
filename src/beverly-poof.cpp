@@ -48,6 +48,12 @@ int aux2pin = 13;
 int aux3pin = A2;
 int aux4pin = A3;
 
+const int BUTTON_COUNT = 3;
+int buttonPin[BUTTON_COUNT] = {5, 6, 7};
+unsigned long buttonStart[BUTTON_COUNT] = {0, 0, 0};
+unsigned long buttonLimit[BUTTON_COUNT] = {1000, 1000, 1000};
+unsigned long buttonWait[BUTTON_COUNT] = {0, 0, 0};
+
 long pooferCommandStart = 0;
 long pooferCommandDetect = 0;
 long pooferStartControl = 0;
@@ -58,6 +64,10 @@ void setup() {
   pinMode(aux2pin, INPUT);
   pinMode(aux3pin, INPUT);
   pinMode(aux4pin, INPUT);
+
+  for (int i = 0; i < BUTTON_COUNT; i++) {
+    pinMode(buttonPin[i], INPUT);    
+  }
 
   trellis.begin(0x70);
   for (uint8_t i=0; i<numKeys; i++) {
@@ -76,6 +86,29 @@ void loop() {
   if (!poof.patternRunning()) {
     processRcCommands();
   }    
+  for (int i = 0; i < BUTTON_COUNT; i++) {
+    if (buttonWait[i] > 0 && millis() - buttonWait[i] > 5000) {
+      Serial.print("Button wait cleared - "); Serial.println(i);
+      buttonWait[i] = 0 ;
+    }
+    if (digitalRead(buttonPin[i])) {
+      if (buttonWait[i] == 0) {
+        Serial.print("Button pressed - "); Serial.println(i);
+        poof.poof(0, 1);
+        if (buttonStart[i] == 0 ) {
+          buttonStart[i] = millis();
+        }
+      }
+      if (buttonStart[i] > 0 && millis() - buttonStart[i] > buttonLimit[i]) {
+        Serial.print("Button off for limit - "); Serial.println(i);
+        buttonWait[i] = millis();
+        poof.poof(0, 0);
+      }
+    } else {
+      poof.poof(0, 0);
+      buttonStart[i] = 0;
+    }
+  }
   poof.iteratePattern();
   if (pooferCommandStart <= 0) {
     clearDisplay();
