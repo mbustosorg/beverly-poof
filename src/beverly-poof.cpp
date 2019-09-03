@@ -66,7 +66,7 @@ void setup() {
   pinMode(aux4pin, INPUT);
 
   for (int i = 0; i < BUTTON_COUNT; i++) {
-    pinMode(buttonPin[i], INPUT);    
+    pinMode(buttonPin[i], INPUT_PULLUP);    
   }
 
   trellis.begin(0x70);
@@ -82,38 +82,49 @@ void setup() {
   }
 }
 
+int keyForButton(int i) {
+  if (i == 0) return 0;
+  if (i == 1) return 3;
+  if (i == 2) return 12;
+  return 0;
+}
+
 void loop() {
   if (!poof.patternRunning()) {
-    processRcCommands();
-  }    
+    //processRcCommands();
+  } else {
+    poof.iteratePattern();
+  }
   for (int i = 0; i < BUTTON_COUNT; i++) {
     if (buttonWait[i] > 0 && millis() - buttonWait[i] > 5000) {
       Serial.print("Button wait cleared - "); Serial.println(i);
-      buttonWait[i] = 0 ;
+      buttonWait[i] = 0;
     }
-    if (digitalRead(buttonPin[i])) {
-      if (buttonWait[i] == 0) {
+    if (!digitalRead(buttonPin[i])) {
+      if (buttonWait[i] == 0 && buttonStart[i] == 0) {
         Serial.print("Button pressed - "); Serial.println(i);
-        poof.poof(0, 1);
-        if (buttonStart[i] == 0 ) {
-          buttonStart[i] = millis();
-        }
+        poof.poof(i, 1);
+        trellis.setLED(keyForButton(i));
+        buttonStart[i] = millis();
       }
       if (buttonStart[i] > 0 && millis() - buttonStart[i] > buttonLimit[i]) {
         Serial.print("Button off for limit - "); Serial.println(i);
+        buttonStart[i] = 0;
         buttonWait[i] = millis();
-        poof.poof(0, 0);
+        poof.poof(i, 0);
+        trellis.clrLED(keyForButton(i));
       }
     } else {
-      poof.poof(0, 0);
+      if (buttonStart[i] > 0) {Serial.print("Button released - "); Serial.println(i);}
+      poof.poof(i, 0);
+      trellis.clrLED(keyForButton(i));
       buttonStart[i] = 0;
     }
   }
-  poof.iteratePattern();
   if (pooferCommandStart <= 0) {
-    clearDisplay();
+    //clearDisplay();
     //processKeyboard();
-    displayPooferStatus();
+    //displayPooferStatus();
   }
   trellis.writeDisplay();
 }

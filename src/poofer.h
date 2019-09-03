@@ -54,8 +54,8 @@ class poofer {
   void poof(int id, int state);
 
   int leds[POOFER_COUNT] = {0, 3, 5};
-  int pooferPins[POOFER_COUNT] = {0, 2, 4};
-  int ignitorPins[POOFER_COUNT] = {1, 3, 5};
+  int pooferPins[POOFER_COUNT] = {2, 3, 4};
+  int ignitorPins[POOFER_COUNT] = {8, 9, 10};
   bool ignitorState[POOFER_COUNT] = {false, false, false};
   
  private:

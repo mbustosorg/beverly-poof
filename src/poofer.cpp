@@ -171,7 +171,7 @@ void poofer::iteratePattern() {
     } else if (runningPattern >= 0) {
       unsigned long currentDiff = millis() - patternStartTime;
       if (currentDiff >= patterns[runningPattern].steps[stepNumber].stepStart) {
-        Serial.println(String(stepNumber));
+        Serial.print("Step: "); Serial.println(String(stepNumber));
       	for (int i = 0; i < POOFER_COUNT; i++) {
 	        digitalWrite(pooferPins[i], patterns[runningPattern].steps[stepNumber].pooferState[i]);
           if (patterns[runningPattern].steps[stepNumber].pooferState[i] == HIGH) {
@@ -207,6 +207,7 @@ void poofer::poof(int id, int state) {
   if (runningPattern == PATTERNS_OFF || state == HIGH) {
     if (id >= 0 && id < POOFER_COUNT) {
       runningPattern = PATTERNS_OFF;
+      //Serial.println(id);
       digitalWrite(pooferPins[id], state);
     }
   }
